@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CV Generator — build a beautiful animated resume</title>
+<meta name="description" content="A free single-file CV / resume generator. Fill in the form, watch the page update live, and download a standalone animated HTML CV." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#06060f;--card:rgba(255,255,255,.045);--stroke:rgba(255,255,255,.10);--text:#eef0f7;--muted:#9aa0b5;
+    --v:#7c3aed;--c:#06b6d4;--p:#ec4899;--grad:linear-gradient(120deg,var(--v),var(--c),var(--p))}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.02em}
+  a{color:inherit;text-decoration:none}
+  .aurora{position:fixed;inset:0;z-index:-3;overflow:hidden;background:radial-gradient(60% 50% at 50% -10%,rgba(124,58,237,.2),transparent 60%),var(--bg)}
+  .aurora span{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;mix-blend-mode:screen;animation:float 18s ease-in-out infinite}
+  .aurora span:nth-child(1){width:46vw;height:46vw;left:-8vw;top:-6vw;background:var(--v)}
+  .aurora span:nth-child(2){width:42vw;height:42vw;right:-10vw;top:8vh;background:var(--c);animation-delay:-6s}
+  .aurora span:nth-child(3){width:38vw;height:38vw;left:25vw;bottom:-14vw;background:var(--p);animation-delay:-11s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(5vw,3vh) scale(1.12)}66%{transform:translate(-4vw,-2vh) scale(.92)}}
+  .gradtext{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 6s linear infinite}
+  @keyframes shine{to{background-position:200% center}}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,40px)}
+  section{padding:clamp(50px,9vw,100px) 0}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.8rem;letter-spacing:.25em;text-transform:uppercase;color:var(--c);margin-bottom:14px}
+  h2{font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:800;margin-bottom:14px}
+
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;justify-content:space-between;align-items:center;
+    padding:14px clamp(20px,5vw,40px);background:rgba(6,6,15,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--stroke)}
+  .topbar .logo{font-family:'Sora';font-weight:800;display:flex;gap:10px;align-items:center}
+  .topbar .logo .d{width:30px;height:30px;border-radius:8px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:.85rem}
+
+  .hero{min-height:90vh;display:flex;flex-direction:column;justify-content:center}
+  .hero .badge{align-self:flex-start;padding:7px 14px;border:1px solid var(--stroke);border-radius:100px;background:var(--card);font-size:.82rem;color:var(--muted);margin-bottom:24px}
+  .hero h1{font-size:clamp(2.5rem,9vw,5.5rem);font-weight:800;line-height:1;margin-bottom:12px}
+  .hero .role{font-family:'JetBrains Mono';font-size:clamp(1rem,2.6vw,1.4rem);color:var(--muted);min-height:1.6em;margin-bottom:10px}
+  .hero .role .typed{color:#fff}.cursor{color:var(--c);animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:0}}
+  .hero .loc{color:var(--muted);margin-bottom:30px}
+  .cta{display:flex;flex-wrap:wrap;gap:14px}
+  .btn{padding:13px 24px;border-radius:12px;font-weight:600;font-size:.95rem;display:inline-flex;align-items:center;gap:9px;transition:.25s;border:1px solid var(--stroke)}
+  .btn.primary{background:var(--grad);background-size:200% auto;color:#fff;border:none;box-shadow:0 10px 30px -8px rgba(124,58,237,.55)}
+  .btn.primary:hover{transform:translateY(-3px);background-position:right center}
+  .btn.ghost{background:var(--card);color:#fff}.btn.ghost:hover{transform:translateY(-3px);background:rgba(255,255,255,.07)}
+
+  .about p{color:var(--muted);font-size:1.05rem;max-width:60ch}
+  .chips{display:flex;flex-wrap:wrap;gap:12px}
+  .chip{padding:10px 18px;border-radius:100px;background:var(--card);border:1px solid var(--stroke);font-size:.92rem;transition:.3s}
+  .chip:hover{transform:translateY(-4px);background:var(--grad);color:#fff;border-color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+  .pcard{background:var(--card);border:1px solid var(--stroke);border-radius:18px;padding:26px;transition:.35s}
+  .pcard:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28)}
+  .pcard .ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:1.4rem;margin-bottom:14px;background:var(--grad)}
+  .pcard h3{font-size:1.15rem;margin-bottom:6px}.pcard p{color:var(--muted);font-size:.93rem;margin-bottom:14px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px}.tag{font-family:'JetBrains Mono';font-size:.72rem;padding:4px 9px;border-radius:7px;background:rgba(255,255,255,.06);color:var(--c)}
+  .contact{text-align:center}.contact .links{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:24px}
+  footer{padding:36px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--stroke)}
+
+  /* editor */
+  .fab{position:fixed;right:22px;bottom:22px;z-index:80;padding:13px 20px;border-radius:100px;border:none;cursor:pointer;font-weight:600;
+    font-family:'Inter';background:var(--grad);background-size:200% auto;color:#fff;display:flex;gap:8px;align-items:center;box-shadow:0 12px 30px -8px rgba(124,58,237,.6);transition:.3s}
+  .fab:hover{transform:translateY(-3px);background-position:right center}
+  .editor{position:fixed;top:0;right:0;height:100%;width:370px;max-width:92vw;z-index:90;background:rgba(10,10,22,.97);backdrop-filter:blur(16px);
+    border-left:1px solid var(--stroke);padding:26px;overflow-y:auto;transform:translateX(105%);transition:transform .45s cubic-bezier(.2,.7,.2,1)}
+  .editor.open{transform:none}
+  .editor h4{font-family:'Sora';margin-bottom:6px}.editor .hint{color:var(--muted);font-size:.82rem;margin-bottom:16px}
+  .editor label{display:block;font-size:.74rem;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.08em}
+  .editor input,.editor textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--stroke);border-radius:10px;padding:10px 12px;color:#fff;font-family:'Inter';font-size:.9rem;resize:vertical}
+  .editor input:focus,.editor textarea:focus{outline:none;border-color:var(--c)}
+  .editor .close{position:absolute;top:18px;right:18px;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer}
+  .dl{margin-top:20px;width:100%;justify-content:center}
+  @media print{.topbar,.fab,.editor,.aurora{display:none!important}body{background:#fff;color:#111}}
+</style>
+</head>
+<body>
+  <div class="aurora"><span></span><span></span><span></span></div>
+
+  <div class="topbar">
+    <div class="logo"><span class="d">CV</span> CV Generator</div>
+    <button class="btn primary" id="openTop" style="padding:9px 16px">✦ Edit your CV</button>
+  </div>
+
+  <header class="hero wrap" id="top">
+    <span class="badge">✨ Fill the form → download your CV</span>
+    <h1>Hi, I'm <span class="gradtext" id="vName">Your Name</span>.</h1>
+    <div class="role">&gt; <span class="typed" id="typed"></span><span class="cursor">▋</span></div>
+    <div class="loc">📍 <span id="vLoc">Your City, Country</span></div>
+    <div class="cta">
+      <a class="btn primary" id="vUpwork" href="#" target="_blank" rel="noopener">Upwork →</a>
+      <a class="btn ghost" id="vFiverr" href="#" target="_blank" rel="noopener">Fiverr</a>
+      <a class="btn ghost" id="vGithub" href="#" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+
+  <section class="about wrap"><div class="eyebrow">About</div><h2>About me</h2><p id="vAbout"></p></section>
+
+  <section class="wrap"><div class="eyebrow">Toolkit</div><h2>Skills</h2><div class="chips" id="vChips"></div></section>
+
+  <section class="wrap"><div class="eyebrow">Work</div><h2>Projects</h2><div class="grid" id="vProjects"></div></section>
+
+  <section class="contact wrap"><div class="eyebrow">Contact</div><h2>Let's work together</h2>
+    <div class="links">
+      <a class="btn primary" id="vEmail" href="#">✉️ Email</a>
+      <a class="btn ghost" id="vUpwork2" href="#" target="_blank" rel="noopener">Upwork</a>
+      <a class="btn ghost" id="vFiverr2" href="#" target="_blank" rel="noopener">Fiverr</a>
+    </div>
+  </section>
+
+  <footer>Made with the CV Generator · vanilla HTML/CSS/JS</footer>
+
+  <button class="fab no-export" id="fab">✦ Edit your CV</button>
+  <aside class="editor no-export" id="editor">
+    <button class="close" id="closeEditor">✕</button>
+    <h4>CV Generator</h4>
+    <div class="hint">Fill in your details — the page updates live. Then download a standalone HTML CV.</div>
+    <label>Full name</label><input id="iName" placeholder="e.g. Jane Doe" />
+    <label>Roles (one per line — they animate)</label><textarea id="iRoles" rows="4" placeholder="Frontend Developer&#10;UI Designer"></textarea>
+    <label>Location</label><input id="iLoc" placeholder="e.g. Berlin, Germany" />
+    <label>About</label><textarea id="iAbout" rows="4" placeholder="A short intro about you and what you help clients with."></textarea>
+    <label>Skills (comma separated)</label><input id="iSkills" placeholder="React, Node.js, Figma, SEO" />
+    <label>Email</label><input id="iEmail" placeholder="you@email.com" />
+    <label>GitHub URL</label><input id="iGithub" placeholder="https://github.com/username" />
+    <label>Upwork URL</label><input id="iUpwork" placeholder="https://upwork.com/..." />
+    <label>Fiverr URL</label><input id="iFiverr" placeholder="https://fiverr.com/..." />
+    <button class="btn primary dl" id="download">⬇ Download CV (HTML)</button>
+    <button class="btn ghost dl" id="printBtn" style="margin-top:10px">🖨 Save as PDF</button>
+  </aside>
+
+<script>
+  const $=(id)=>document.getElementById(id);
+  // generic starter data — no personal info
+  let roles=["Your Role","What You Do","Another Skill"];
+  let skills=["Skill One","Skill Two","Skill Three","Skill Four"];
+  const projects=[
+    {icon:"💡",title:"Your Project",desc:"Describe a project you built and the result it delivered.",tags:["Tech","Stack"]},
+    {icon:"🚀",title:"Another Project",desc:"Add your best work here to impress clients.",tags:["More","Tools"]},
+  ];
+
+  function renderChips(){$('vChips').innerHTML=skills.map(s=>`<div class="chip">${s}</div>`).join('');}
+  function renderProjects(){$('vProjects').innerHTML=projects.map(p=>`<div class="pcard">
+    <div class="ico">${p.icon}</div><h3>${p.title}</h3><p>${p.desc}</p>
+    <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div></div>`).join('');}
+  renderChips();renderProjects();
+  $('vAbout').textContent="Write a short intro about yourself, your focus and the kind of work you help clients with.";
+
+  // typing
+  let ri=0,ci=0,del=false;
+  (function type(){const t=$('typed');if(!t)return;const w=roles[ri%roles.length]||'';t.textContent=w.slice(0,ci);
+    if(!del&&ci<w.length)ci++;else if(!del&&ci===w.length){del=true;setTimeout(type,1300);return;}
+    else if(del&&ci>0)ci--;else{del=false;ri++;}setTimeout(type,del?40:90);})();
+
+  // editor
+  const ed=$('editor');
+  const open=()=>ed.classList.add('open');
+  $('fab').addEventListener('click',open);$('openTop').addEventListener('click',open);
+  $('closeEditor').addEventListener('click',()=>ed.classList.remove('open'));
+  const on=(id,fn)=>{const el=$(id);if(el)el.addEventListener('input',()=>fn(el.value));};
+  on('iName',v=>$('vName').textContent=v||'Your Name');
+  on('iLoc',v=>$('vLoc').textContent=v||'Your City, Country');
+  on('iAbout',v=>$('vAbout').textContent=v||'');
+  on('iRoles',v=>{roles=v.split('\n').map(s=>s.trim()).filter(Boolean);if(!roles.length)roles=['Your Role'];ri=0;ci=0;del=false;});
+  on('iSkills',v=>{skills=v.split(',').map(s=>s.trim()).filter(Boolean);if(!skills.length)skills=['Skill One'];renderChips();});
+  on('iEmail',v=>{$('vEmail').href='mailto:'+v;});
+  on('iGithub',v=>{$('vGithub').href=v||'#';});
+  on('iUpwork',v=>{$('vUpwork').href=v||'#';$('vUpwork2').href=v||'#';});
+  on('iFiverr',v=>{$('vFiverr').href=v||'#';$('vFiverr2').href=v||'#';});
+
+  $('printBtn').addEventListener('click',()=>window.print());
+  $('download').addEventListener('click',()=>{
+    const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.no-export').forEach(n=>n.remove());
+    const html='<!DOCTYPE html>\n'+clone.outerHTML;
+    const blob=new Blob([html],{type:'text/html'});const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='cv-'+(($('iName').value||'cv').toLowerCase().replace(/\s+/g,'-'))+'.html';a.click();URL.revokeObjectURL(url);
+  });
+</script>
+</body>
+</html>

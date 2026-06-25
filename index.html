@@ -21,6 +21,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body.lock{overflow:hidden;height:100vh}
   h1,h2,h3,.brand{font-family:'Sora',sans-serif;letter-spacing:-.02em}
   a{color:inherit;text-decoration:none}
   ::selection{background:rgba(124,58,237,.4)}
@@ -29,7 +30,7 @@
   .loader{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;
     animation:loaderOut .9s cubic-bezier(.7,0,.3,1) 1.5s forwards}
   .loader .lname{font-family:'Sora';font-weight:800;font-size:clamp(1.6rem,6vw,3rem);overflow:hidden;white-space:nowrap}
-  .loader .lname span{display:inline-block;opacity:0;transform:translateY(100%);animation:lup .6s cubic-bezier(.2,.7,.2,1) forwards}
+  .loader .lname span{display:inline-block;opacity:0;transform:translate(var(--tx,0),var(--ty,0)) rotate(var(--rot,0)) scale(.4);animation:lup .8s cubic-bezier(.2,.8,.2,1) forwards}
   @keyframes lup{to{opacity:1;transform:none}}
   @keyframes loaderOut{to{transform:translateY(-100%);visibility:hidden}}
 
@@ -58,6 +59,7 @@
   .brand{font-weight:800;font-size:1.12rem;display:flex;align-items:center;gap:11px}
   .brand .dot{width:34px;height:34px;border-radius:10px;background:var(--grad);display:grid;place-items:center;font-size:.85rem;color:#fff;
     box-shadow:0 0 24px rgba(124,58,237,.6);font-family:'Sora';font-weight:800}
+  .brand .cv{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:.22em;padding:3px 7px;border:1px solid var(--stroke);border-radius:6px;background:var(--grad);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 6s linear infinite}
   .navlinks{display:flex;gap:28px;font-size:.92rem}
   .navlinks a{color:var(--muted);position:relative;transition:.25s}
   .navlinks a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--grad);transition:.3s}
@@ -166,7 +168,7 @@
   @media print{nav,.totop,.scrollhint,.aurora,.grain,.stars,.spotlight,.loader,.progress{display:none!important}body{background:#fff;color:#111}}
 </style>
 </head>
-<body>
+<body class="lock">
   <div class="loader"><div class="lname" id="lname"></div></div>
   <div class="progress" id="progress"></div>
   <div class="aurora"><span></span><span></span><span></span></div>
@@ -175,7 +177,7 @@
   <div class="spotlight" id="spot"></div>
 
   <nav id="nav">
-    <a class="brand" href="#top"><span class="dot">FM</span> Fedir Malikov</a>
+    <a class="brand" href="#top"><span class="dot">FM</span> Fedir Malikov <span class="cv">CV</span></a>
     <div class="navlinks">
       <a href="#about">About</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#services">Services</a><a href="#contact">Contact</a>
     </div>
@@ -280,8 +282,11 @@
     {e:"🔌",t:"API Integration",d:"Connecting CRMs, sheets, payments and third-party services."},
   ];
 
-  // preloader letters
-  (()=>{const t="Fedir Malikov";$('lname').innerHTML=[...t].map((ch,i)=>`<span style="animation-delay:${i*45}ms">${ch===' '?'&nbsp;':ch}</span>`).join('');})();
+  // preloader letters fly in from random directions, scroll locked until done
+  (()=>{const t="Fedir Malikov";const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+    $('lname').innerHTML=[...t].map((ch,i)=>{const tx=rnd(-440,440),ty=rnd(-340,340),r=rnd(-90,90);
+      return `<span style="--tx:${tx}px;--ty:${ty}px;--rot:${r}deg;animation-delay:${i*55}ms">${ch===' '?'&nbsp;':ch}</span>`;}).join('');})();
+  setTimeout(()=>{document.body.classList.remove('lock');window.scrollTo(0,0);},2500);
   // hero name words
   $('heroName').innerHTML=`<span class="word" style="animation-delay:1.5s">Fedir</span> <span class="word gradtext" style="animation-delay:1.65s">Malikov</span>`;
   $('year').textContent=new Date().getFullYear();

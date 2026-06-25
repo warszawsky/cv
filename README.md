@@ -22,7 +22,11 @@ built-in editor, edit your details live, and download a standalone HTML CV.
 Just open `index.html` in a browser. Click **✦ Customize CV** (bottom-right) to
 edit your name, roles, about, location and links, then download your own copy.
 
+## 📂 Files
+- **`index.html`** — the personal CV (animated, single file)
+- **`generator.html`** — a blank reusable CV generator: fill the form, edit live, and download a standalone HTML CV for anyone
+
 ## 🛠 How it works
-Content (skills, projects, roles) lives in small JS arrays at the bottom of the
-file and is rendered into the page — so it's easy to repurpose as a template for
-any person.
+Content (skills, projects, roles) lives in small JS arrays and is rendered into
+the page. `generator.html` exposes that data through a live editor form so it can
+build a CV for any person.
